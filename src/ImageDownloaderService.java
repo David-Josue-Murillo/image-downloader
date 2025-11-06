@@ -3,6 +3,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,15 +75,13 @@ public class ImageDownloaderService {
             }
 
             // Éxito: devolver ruta del archivo
-            return new DownloadResult(true,
-                    "Imagen descargada exitosamente en: " + rutaDestino.toString(),
-                    rutaDestino.toString());
+            return new DownloadResult(true, "Imagen descargada exitosamente en: " + rutaDestino.toString(), rutaDestino.toString());
 
+        } catch (MalformedURLException e) {
+            return new DownloadResult(false, "URL mal formada: " + e.getMessage(), null);
         } catch (IOException e) {
             // En caso de cualquier excepción de E/S, devolver mensaje con la causa
-            return new DownloadResult(false,
-                    "Excepción durante la descarga: " + e.getMessage(),
-                    null);
+            return new DownloadResult(false, "Error de red durante la descarga: " + e.getMessage(), null);
         }
     }
 
