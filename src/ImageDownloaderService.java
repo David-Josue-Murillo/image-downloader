@@ -102,7 +102,7 @@ public class ImageDownloaderService {
             if (tipoContenido != null && tipoContenido.contains("/")) {
                 extension = tipoContenido.substring(tipoContenido.indexOf('/') + 1);
             }
-            return "imagen_descargada." + extension;
+            return "img_." + extension;
         }
 
         return nombreDesdeURL;
