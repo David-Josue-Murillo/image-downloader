@@ -21,10 +21,10 @@ public class ImageDownloader {
 
         try {
             DownloadResult result = downloader.download(url, "imagenes_descargadas");
-            if (result.isSuccess()) {
-                JOptionPane.showMessageDialog(null, result.getMessage(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            if (result.esExito()) {
+                JOptionPane.showMessageDialog(null, result.getMensaje(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, result.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, result.getMensaje(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Ocurrió un error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
