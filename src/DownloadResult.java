@@ -6,25 +6,25 @@
  *
  */
 public class DownloadResult {
-    private boolean success;
-    private String message;
-    private String filePath;
+    private boolean exito;
+    private String mensaje;
+    private String rutaArchivo;
 
-    public DownloadResult(boolean success, String message, String filePath) {
-        this.success = success;
-        this.message = message;
-        this.filePath = filePath;
+    public DownloadResult(boolean exito, String mensaje, String rutaArchivo) {
+        this.exito = exito;
+        this.mensaje = mensaje;
+        this.rutaArchivo = rutaArchivo;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public boolean esExito() {
+        return exito;
     }
 
-    public String getMessage() {
-        return message;
+    public String getMensaje() {
+        return mensaje;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public String getRutaArchivo() {
+        return rutaArchivo;
     }
 }

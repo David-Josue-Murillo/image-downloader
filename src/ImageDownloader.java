@@ -9,14 +9,25 @@ import javax.swing.*;
  */
 public class ImageDownloader {
     public static void main(String[] args) {
+        ImageDownloaderService downloader;
+        FileManager fileManager = new FileManager("imagenes_descargadas");
+        downloader = new ImageDownloaderService(fileManager);
+
         String url = JOptionPane.showInputDialog(null, "URL de la imagen a descargar:", "Descargador de Imágenes", JOptionPane.QUESTION_MESSAGE);
+        if (url.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor ingrese una URL válida.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-
-        if (url != null && !url.trim().isEmpty()) {
-            // Aquí podrías iniciar el proceso de descarga usando ImageDownloaderService
-            JOptionPane.showMessageDialog(null, "Iniciando descarga para la URL: " + url, "Descargador de Imágenes", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(null, "No se proporcionó una URL válida.", "Descargador de Imágenes", JOptionPane.ERROR_MESSAGE);
+        try {
+            DownloadResult result = downloader.download(url, "imagenes_descargadas");
+            if (result.isSuccess()) {
+                JOptionPane.showMessageDialog(null, result.getMessage(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, result.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Ocurrió un error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
