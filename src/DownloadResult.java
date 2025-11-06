@@ -1,3 +1,10 @@
+/**
+ * Representa el resultado de una operación de descarga de imagen.
+ *
+ * Esta clase encapsula toda la información sobre el resultado de una descarga,
+ * incluyendo el estado de éxito, mensajes descriptivos y la ruta del archivo.
+ *
+ */
 public class DownloadResult {
     private boolean success;
     private String message;
