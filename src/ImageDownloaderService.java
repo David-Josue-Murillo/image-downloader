@@ -25,15 +25,7 @@ public class ImageDownloaderService {
         try {
             // Determinar el directorio destino: usar el parámetro si se proporcionó,
             // en caso contrario delegar en el FileManager inyectado.
-            final Path destinoDirectorio;
-            if (directorio != null && !directorio.trim().isEmpty()) {
-                destinoDirectorio = Paths.get(directorio);
-                if (!Files.exists(destinoDirectorio)) {
-                    Files.createDirectories(destinoDirectorio);
-                }
-            } else {
-                destinoDirectorio = fileManager.crearDirectorio();
-            }
+            Path destinoDirectorio = determinarDirectorioDestino(directorio);
 
             // Construir URL y abrir conexión HTTP
             URL url = new URL(urlString);
@@ -57,17 +49,8 @@ public class ImageDownloaderService {
             String nombreArchivo = generarNombreArchivo(urlString, tipoContenido);
             Path rutaDestino = destinoDirectorio.resolve(nombreArchivo);
 
-            // Leer los bytes desde la conexión y escribirlos en el archivo destino
-            try (BufferedInputStream entrada = new BufferedInputStream(conexion.getInputStream());
-                 BufferedOutputStream salida = new BufferedOutputStream(new FileOutputStream(rutaDestino.toFile()))) {
-
-                final byte[] buffer = new byte[8 * 1024]; // buffer de 8KB
-                int bytesLeidos;
-                while ((bytesLeidos = entrada.read(buffer)) != -1) {
-                    salida.write(buffer, 0, bytesLeidos);
-                }
-                salida.flush();
-            }
+            // Guardar el contenido de la conexión en el archivo destino (se extrae a función)
+            guardarContenidoDesdeConexion(conexion, rutaDestino);
 
             // Éxito: devolver ruta del archivo
             return new DownloadResult(true, "Imagen descargada exitosamente en: " + rutaDestino.toString(), rutaDestino.toString());
@@ -121,6 +104,41 @@ public class ImageDownloaderService {
             return conexion;
         } catch (IOException e) {
             throw new RuntimeException("Error al crear la conexión HTTP: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Crea o obtiene el directorio destino donde se guardará la imagen.
+     * Si se proporciona `directorio`, se asegura que exista (creándolo si hace falta).
+     * Si no se proporciona, delega en el FileManager.
+     */
+    private Path determinarDirectorioDestino(String directorio) throws IOException {
+        if (directorio != null && !directorio.trim().isEmpty()) {
+            Path destino = Paths.get(directorio);
+            if (!Files.exists(destino)) {
+                Files.createDirectories(destino);
+            }
+            return destino;
+        } else {
+            return fileManager.crearDirectorio();
+        }
+    }
+
+    /**
+     * Lee el InputStream de la conexión y escribe su contenido en `rutaDestino`.
+     */
+    private void guardarContenidoDesdeConexion(HttpURLConnection conexion, Path rutaDestino) throws IOException {
+        try (BufferedInputStream entrada = new BufferedInputStream(conexion.getInputStream());
+             BufferedOutputStream salida = new BufferedOutputStream(new FileOutputStream(rutaDestino.toFile()))) {
+
+            final byte[] buffer = new byte[8 * 1024]; // buffer de 8KB
+            int bytesLeidos;
+            while ((bytesLeidos = entrada.read(buffer)) != -1) {
+                salida.write(buffer, 0, bytesLeidos);
+            }
+            salida.flush();
+        } catch (IOException e) {
+            throw new IOException("Error al guardar el archivo en disco: " + rutaDestino.toString(), e);
         }
     }
 }
