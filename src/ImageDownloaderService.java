@@ -37,12 +37,7 @@ public class ImageDownloaderService {
 
             // Construir URL y abrir conexión HTTP
             URL url = new URL(urlString);
-            HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-            conexion.setInstanceFollowRedirects(true); // seguir redirecciones si las hay
-            conexion.setRequestMethod("GET");
-            conexion.setConnectTimeout(10_000); // 10s timeout conexión
-            conexion.setReadTimeout(5_000); // 5s timeout lectura
-            conexion.setRequestProperty("User-Agent", "Java ImageDownloaderGUI");
+            HttpURLConnection conexion = crearConexion(url);
 
             // Comprobar código de respuesta HTTP
             int codigoRespuesta = conexion.getResponseCode();
@@ -98,7 +93,7 @@ public class ImageDownloaderService {
 
         // Si no se obtiene un nombre válido (vacío o sin extensión), construir uno por defecto
         if (nombreDesdeURL.isEmpty() || !nombreDesdeURL.contains(".")) {
-            String extension = "img"; // extension genérico
+            String extension = "img"; // extension genérico (fallback)
             if (tipoContenido != null && tipoContenido.contains("/")) {
                 extension = tipoContenido.substring(tipoContenido.indexOf('/') + 1);
             }
@@ -106,5 +101,26 @@ public class ImageDownloaderService {
         }
 
         return nombreDesdeURL;
+    }
+
+    /**
+     * Crea y configura una conexión HTTP (GET) para la URL proporcionada.
+     *
+     * Este método encapsula la configuración de timeouts, encabezados y
+     * comportamiento de redirección para evitar duplicación en el método
+     * principal de descarga.
+     */
+    private HttpURLConnection crearConexion(URL url) {
+        try {
+            HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+            conexion.setInstanceFollowRedirects(true); // seguir redirecciones si las hay
+            conexion.setRequestMethod("GET");
+            conexion.setConnectTimeout(10_000);
+            conexion.setReadTimeout(5_000);
+            conexion.setRequestProperty("User-Agent", "Java ImageDownloaderGUI");
+            return conexion;
+        } catch (IOException e) {
+            throw new RuntimeException("Error al crear la conexión HTTP: " + e.getMessage(), e);
+        }
     }
 }
